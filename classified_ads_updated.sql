@@ -1,5 +1,5 @@
 
--- Updated Database Schema for Multi-language Classified Ads System
+ Database Schema for Multi-language Classified Ads System
 
 DROP DATABASE IF EXISTS classified_ads;
 CREATE DATABASE classified_ads;
@@ -19,7 +19,7 @@ CREATE TABLE members (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Categories Table (Multi-language support)
+-- Categories Table 
 CREATE TABLE categories (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name_en VARCHAR(255) NOT NULL,
@@ -81,58 +81,4 @@ CREATE TABLE offers (
     FOREIGN KEY (sender_id) REFERENCES members(id) ON DELETE CASCADE
 );
 
--- Sample Data
-INSERT INTO categories (name_en, name_fr, description_en, description_fr) VALUES
-('Electronics', 'Électronique', 'Electronic gadgets and accessories.', 'Gadgets électroniques et accessoires'),
-('Furniture', 'Meubles', 'Home and office furniture.', 'Meubles de maison et de bureau');
 
-INSERT INTO subcategories (category_id, name_en, name_fr) VALUES
-(1, 'Smartphones', 'Téléphones intelligents'),
-(1, 'Laptops', 'Ordinateurs portables'),
-(2, 'Chairs', 'Chaises'),
-(2, 'Tables', 'Tables');
-
-INSERT INTO members (name, address, city, state, phone, email, password, status) VALUES
-('John Doe', '123 Main Street', 'Montreal', 'Quebec', '1234567890', 'john@example.com',
- '$2y$10$z.XsJUtTS7Bb.Tn7jYZzGe0nxUJP1GS6eqj8f5HdAphj5W8NfZ7HG', 'active'),
-('Jane Smith', '456 Maple Ave', 'Toronto', 'Ontario', '9876543210', 'jane@example.com',
- '$2y$10$EynJrFt4eHohDoQ6Vwz/7e4s9YbF34brjsrVxPYu2b1W9PzM.rjxC', 'active');
-
-INSERT INTO ads (member_id, category_id, subcategory_id, title, description, price, status, start_date, expiry_date) VALUES
-(1, 1, 1, 'iPhone 13 Pro Max', 'Brand new phone, 128GB, Blue.', 999.99, 'active', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 30 DAY)),
-(2, 2, 4, 'Wooden Dining Table', 'Classic 6-seater solid wood dining table.', 450.00, 'active', CURDATE(), DATE_ADD(CURDATE(), INTERVAL 30 DAY));
-
-INSERT INTO ad_images (ad_id, image_path) VALUES
-(1, 'uploads/iphone.jpg'),
-(2, 'uploads/dining_table.jpg');
-
-INSERT INTO admins (email, password) VALUES ('admin@postitnow.com', 'admin123');
-
--- Validation Queries
-
--- 1. Get Categories in English or French with Descriptions
--- English:
-SELECT name_en AS name, description_en AS description FROM categories;
--- French:
-SELECT name_fr AS name, description_fr AS description FROM categories;
-
--- 2. List of Members
-SELECT * FROM members;
-
--- 3. List of Ads for a Given Member (e.g., Member ID = 1)
-SELECT * FROM ads WHERE member_id = 1;
-
--- 4. Non-expired Ads per Category/Subcategory
-SELECT ads.*, categories.name_en AS category, subcategories.name_en AS subcategory
-FROM ads
-JOIN categories ON ads.category_id = categories.id
-LEFT JOIN subcategories ON ads.subcategory_id = subcategories.id
-WHERE expiry_date >= CURDATE();
-
--- 5. Non-expired Ads by Title and State or City (example: "iPhone", "Quebec")
-SELECT ads.*, members.state, members.city
-FROM ads
-JOIN members ON ads.member_id = members.id
-WHERE ads.expiry_date >= CURDATE()
-  AND ads.title LIKE '%iPhone%'
-  AND (members.state = 'Quebec' OR members.city = 'Montreal');
