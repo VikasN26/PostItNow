@@ -7,7 +7,7 @@ USE classified_ads;
 
 -- Members Table
 CREATE TABLE members (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY
     name VARCHAR(255) NOT NULL,
     address TEXT NOT NULL,
     city VARCHAR(100) NOT NULL,
